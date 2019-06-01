@@ -1,10 +1,9 @@
 # Referencias y Comandos utiles
 
-1. python
-   -https://www.youtube.com/watch?v=N5vscPTWKOk
-https://www.python.org/downloads/release/python-367/
-python -m pip install
-
+1.  python
+    - https://www.youtube.com/watch?v=N5vscPTWKOk
+    - https://www.python.org/downloads/release/python-367/
+    - python -m pip install
 git
 https://git-scm.com/download/win
 
