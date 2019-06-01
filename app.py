@@ -11,11 +11,9 @@ from flask import render_template, request, redirect
 
 
 app= Flask(__name__)
-@app.route('/')
-def index():
-	return 'Ok!'
 
-'''
+
+@app.route('/')
 
 
 @app.route('/index.html')
@@ -37,7 +35,6 @@ def about():
 @app.route('/blog-home.html')
 def blog():
 	return render_template("blog-home.html")
-'''
 
 if __name__== "__main__":
 	app.run()
