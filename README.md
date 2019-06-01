@@ -1,7 +1,7 @@
-# clinica-concepto1
+# Referencias y Comandos utiles
 
-python
-https://www.youtube.com/watch?v=N5vscPTWKOk
+1. python
+    -https://www.youtube.com/watch?v=N5vscPTWKOk
 https://www.python.org/downloads/release/python-367/
 python -m pip install
 
