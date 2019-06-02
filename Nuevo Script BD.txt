@@ -1,0 +1,227 @@
+CREATE TABLE doctor (
+    nombre_doctor   VARCHAR2(100) NOT NULL,
+    rut_doctor      VARCHAR2(11) NOT NULL,
+    especialidad    VARCHAR2(100) NOT NULL,
+    fec_ingreso     DATE,
+    comuna          VARCHAR2(50),
+    correo          VARCHAR2(100) NOT NULL,
+    telefono        VARCHAR2(15) NOT NULL
+);
+
+ALTER TABLE doctor ADD CONSTRAINT doctor_pk PRIMARY KEY ( rut_doctor );
+
+CREATE TABLE doctor_usuario (
+    doctor_rut_doctor    VARCHAR2(11) NOT NULL,
+    usuario_id_usuario   VARCHAR2(50) NOT NULL
+);
+
+ALTER TABLE doctor_usuario ADD CONSTRAINT doctor_usuario_pk PRIMARY KEY ( doctor_rut_doctor,
+                                                                          usuario_id_usuario );
+
+CREATE TABLE examenes (
+    id_examen                          VARCHAR2(20) NOT NULL,
+    nombre_paciente                    VARCHAR2(100) NOT NULL,
+    tipo_examen                        VARCHAR2(100) NOT NULL,
+    resultado_examen                   VARCHAR2(200) NOT NULL,
+    imagen_examen                      BLOB NOT NULL,
+    encargado_examen                   VARCHAR2(100) NOT NULL, 
+    ficha_clinica_medico_responsable   VARCHAR2(50) NOT NULL
+);
+
+ALTER TABLE examenes ADD CONSTRAINT examenes_pk PRIMARY KEY ( id_examen );
+
+CREATE TABLE farmacia (
+    id_farmacia        VARCHAR2(50) NOT NULL,
+    nombre_farmacia    VARCHAR2(100) NOT NULL,
+    receta_id_receta   VARCHAR2(50) NOT NULL
+);
+
+ALTER TABLE farmacia ADD CONSTRAINT farmacia_pk PRIMARY KEY ( id_farmacia );
+
+CREATE TABLE ficha_clinica (
+    medico_responsable   VARCHAR2(50) NOT NULL,
+    paramedico           VARCHAR2(100) NOT NULL,
+    diagnostico          VARCHAR2(250) NOT NULL,
+    receta               VARCHAR2(200) NOT NULL,
+    categorizacion_urg   VARCHAR2(50) NOT NULL,
+    hospitalizacion      CHAR(1) NOT NULL,
+    ficha_paciente_rut   VARCHAR2(11) NOT NULL
+);
+
+ALTER TABLE ficha_clinica ADD CONSTRAINT ficha_clinica_pk PRIMARY KEY ( medico_responsable );
+
+CREATE TABLE ficha_ingreso (
+    nombre_paciente      VARCHAR2(50) NOT NULL,
+    fecha_ingreso        DATE NOT NULL,
+    hora_ingreso         DATE NOT NULL,
+    motivo_consulta      VARCHAR2(50) NOT NULL,
+    datos_acompañante    CHAR(1) NOT NULL,
+    ficha_paciente_rut   VARCHAR2(11) NOT NULL
+);
+
+ALTER TABLE ficha_ingreso ADD CONSTRAINT ficha_ingreso_pk PRIMARY KEY ( nombre_paciente );
+
+CREATE TABLE ficha_paciente (
+    rut                VARCHAR2(11) NOT NULL,
+    nombres_paciente   VARCHAR2(100) NOT NULL,
+    sexo               CHAR(1) NOT NULL,
+    edad               NUMBER(3) NOT NULL,
+    fec_naciemiento    DATE NOT NULL,
+    direccion          VARCHAR2(50) NOT NULL,
+    e_civil            VARCHAR2(15) NOT NULL,
+    telefono           VARCHAR2(15) NOT NULL,
+    comuna             VARCHAR2(20) NOT NULL,
+    correo             VARCHAR2(100) NOT NULL,
+    prev_social        VARCHAR2(50) NOT NULL,
+    antecedentes       VARCHAR2(200) NOT NULL,
+    observaciones      VARCHAR2(200) NOT NULL
+);
+
+ALTER TABLE ficha_paciente ADD CONSTRAINT ficha_paciente_pk PRIMARY KEY ( rut );
+
+CREATE TABLE medicamento (
+    nombre_med                 VARCHAR2(100) NOT NULL,
+    laboratorio                VARCHAR2(100),
+    nombre_fantasia            VARCHAR2(100) NOT NULL,
+    stock_farmacia_id_codigo   VARCHAR2(100) NOT NULL
+);
+
+ALTER TABLE medicamento ADD CONSTRAINT medicamento_pk PRIMARY KEY ( nombre_med );
+
+CREATE TABLE receta (
+    id_receta                          VARCHAR2(50) NOT NULL,
+    rut_paciente                       VARCHAR2(11) NOT NULL,
+    diagnostico                        VARCHAR2(200) NOT NULL,
+    tratamiento                        VARCHAR2(200) NOT NULL,
+    fecha_receta                       DATE NOT NULL,
+    nombre_medico                      VARCHAR2(100) NOT NULL, 
+    ficha_medico_responsable   VARCHAR2(50) NOT NULL
+);
+
+ALTER TABLE receta ADD CONSTRAINT receta_pk PRIMARY KEY ( id_receta );
+
+CREATE TABLE receta_doctor (
+    receta_id_receta    VARCHAR2(50) NOT NULL,
+    doctor_rut_doctor   VARCHAR2(11) NOT NULL
+);
+
+ALTER TABLE receta_doctor ADD CONSTRAINT receta_doctor_pk PRIMARY KEY ( receta_id_receta,
+                                                                        doctor_rut_doctor );
+
+CREATE TABLE stock_farmacia (
+    id_codigo              VARCHAR2(100) NOT NULL,
+    nombre_medico          VARCHAR2(100),
+    stock_med              NUMBER(2) NOT NULL,
+    fecha_retiro           DATE NOT NULL,
+    tipo_med               VARCHAR2(100) NOT NULL,
+    tipo_pedido            VARCHAR2(30) NOT NULL,
+    farmacia_id_farmacia   VARCHAR2(50) NOT NULL
+);
+
+CREATE UNIQUE INDEX stock_farmacia__idx ON
+    stock_farmacia (
+        farmacia_id_farmacia
+    ASC );
+
+ALTER TABLE stock_farmacia ADD CONSTRAINT stock_farmacia_pk PRIMARY KEY ( id_codigo );
+
+CREATE TABLE usuario (
+    id_usuario       VARCHAR2(50) NOT NULL,
+    nombre_usuario   VARCHAR2(100) NOT NULL,
+    clave            VARCHAR2(100) NOT NULL,
+    tipo_usuario     VARCHAR2(100) NOT NULL
+);
+
+ALTER TABLE usuario ADD CONSTRAINT usuario_pk PRIMARY KEY ( id_usuario );
+
+ALTER TABLE doctor_usuario
+    ADD CONSTRAINT doctor_usuario_doctor_fk FOREIGN KEY ( doctor_rut_doctor )
+        REFERENCES doctor ( rut_doctor );
+
+ALTER TABLE doctor_usuario
+    ADD CONSTRAINT doctor_usuario_usuario_fk FOREIGN KEY ( usuario_id_usuario )
+        REFERENCES usuario ( id_usuario );
+
+ALTER TABLE examenes
+    ADD CONSTRAINT examenes_ficha_clinica_fk FOREIGN KEY ( ficha_clinica_medico_responsable )
+        REFERENCES ficha_clinica ( medico_responsable );
+
+ALTER TABLE farmacia
+    ADD CONSTRAINT farmacia_receta_fk FOREIGN KEY ( receta_id_receta )
+        REFERENCES receta ( id_receta );
+
+--  ERROR: FK name length exceeds maximum allowed length(30) 
+ALTER TABLE ficha_clinica
+    ADD CONSTRAINT ficha_clinica_ficha_paciente_fk FOREIGN KEY ( ficha_paciente_rut )
+        REFERENCES ficha_paciente ( rut );
+
+--  ERROR: FK name length exceeds maximum allowed length(30) 
+ALTER TABLE ficha_ingreso
+    ADD CONSTRAINT ficha_ingreso_ficha_paciente_fk FOREIGN KEY ( ficha_paciente_rut )
+        REFERENCES ficha_paciente ( rut );
+
+ALTER TABLE medicamento
+    ADD CONSTRAINT medicamento_stock_farmacia_fk FOREIGN KEY ( stock_farmacia_id_codigo )
+        REFERENCES stock_farmacia ( id_codigo );
+
+ALTER TABLE receta_doctor
+    ADD CONSTRAINT receta_doctor_doctor_fk FOREIGN KEY ( doctor_rut_doctor )
+        REFERENCES doctor ( rut_doctor );
+
+ALTER TABLE receta_doctor
+    ADD CONSTRAINT receta_doctor_receta_fk FOREIGN KEY ( receta_id_receta )
+        REFERENCES receta ( id_receta );
+
+ALTER TABLE receta
+    ADD CONSTRAINT receta_ficha_clinica_fk FOREIGN KEY ( ficha_medico_responsable )
+        REFERENCES ficha_clinica ( medico_responsable );
+
+ALTER TABLE stock_farmacia
+    ADD CONSTRAINT stock_farmacia_farmacia_fk FOREIGN KEY ( farmacia_id_farmacia )
+        REFERENCES farmacia ( id_farmacia );
+
+ALTER TABLE doctor_usuario
+    ADD CONSTRAINT doctor_usuario_doctor_fk FOREIGN KEY ( doctor_rut_doctor )
+        REFERENCES doctor ( rut_doctor );
+
+ALTER TABLE doctor_usuario
+    ADD CONSTRAINT doctor_usuario_usuario_fk FOREIGN KEY ( usuario_id_usuario )
+        REFERENCES usuario ( id_usuario );
+
+ALTER TABLE examenes
+    ADD CONSTRAINT examenes_ficha_clinica_fk FOREIGN KEY ( ficha_clinica_medico_responsable )
+        REFERENCES ficha_clinica ( medico_responsable );
+
+ALTER TABLE farmacia
+    ADD CONSTRAINT farmacia_receta_fk FOREIGN KEY ( receta_id_receta )
+        REFERENCES receta ( id_receta );
+
+--  ERROR: FK name length exceeds maximum allowed length(30) 
+ALTER TABLE ficha_clinica
+    ADD CONSTRAINT ficha_clinica_ficha_paciente_fk FOREIGN KEY ( ficha_paciente_rut )
+        REFERENCES ficha_paciente ( rut );
+
+--  ERROR: FK name length exceeds maximum allowed length(30) 
+ALTER TABLE ficha_ingreso
+    ADD CONSTRAINT ficha_ingreso_ficha_paciente_fk FOREIGN KEY ( ficha_paciente_rut )
+        REFERENCES ficha_paciente ( rut );
+
+ALTER TABLE medicamento
+    ADD CONSTRAINT medicamento_stock_farmacia_fk FOREIGN KEY ( stock_farmacia_id_codigo )
+        REFERENCES stock_farmacia ( id_codigo );
+
+ALTER TABLE receta_doctor
+    ADD CONSTRAINT receta_doctor_doctor_fk FOREIGN KEY ( doctor_rut_doctor )
+        REFERENCES doctor ( rut_doctor );
+
+ALTER TABLE receta_doctor
+    ADD CONSTRAINT receta_doctor_receta_fk FOREIGN KEY ( receta_id_receta )
+        REFERENCES receta ( id_receta );
+
+ALTER TABLE receta
+    ADD CONSTRAINT receta_ficha_clinica_fk FOREIGN KEY ( ficha_clinica_medico_responsable )
+        REFERENCES ficha_clinica ( medico_responsable );
+
+ALTER TABLE stock_farmacia
+    ADD CONSTRAINT stock_farmacia_farmacia_fk FOREIGN KEY ( farmacia_id_farmacia )
+        REFERENCES farmacia ( id_farmacia );
