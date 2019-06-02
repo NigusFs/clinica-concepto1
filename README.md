@@ -26,3 +26,4 @@
 **https://clinica-concepto1.herokuapp.com/** 
 
 **https://trello.com/b/sCtSxWVX/clinica-concepto**
+{%load static%}
