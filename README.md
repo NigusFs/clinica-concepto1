@@ -10,7 +10,10 @@
 3.  GitHub
     - https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners
     - git remote add origin https://github.com/NigusFs/clinica-concepto1.git
-    - git push -u origin master
+    - git pull origin master
+    - git add .
+    - git commit -m "new commit"
+    - git push  origin master
 
 4.  Herokuh
     - https://www.youtube.com/watch?v=pmRT8QQLIqk
